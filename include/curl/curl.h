@@ -47,6 +47,12 @@
 #define WIN32
 #endif
 
+#if (defined(WIN32))
+#define CURL_MEMORY_CALLCONV __cdecl
+#else
+#define CURL_MEMORY_CALLCONV
+#endif
+
 #include <stdio.h>
 #include <limits.h>
 
@@ -395,11 +401,11 @@ typedef curlioerr (*curl_ioctl_callback)(CURL *handle,
  * curl_global_init_mem() function to set user defined memory management
  * callback routines.
  */
-typedef void *(*curl_malloc_callback)(size_t size);
-typedef void (*curl_free_callback)(void *ptr);
-typedef void *(*curl_realloc_callback)(void *ptr, size_t size);
-typedef char *(*curl_strdup_callback)(const char *str);
-typedef void *(*curl_calloc_callback)(size_t nmemb, size_t size);
+typedef void *(CURL_MEMORY_CALLCONV *curl_malloc_callback)(size_t size);
+typedef void (CURL_MEMORY_CALLCONV *curl_free_callback)(void *ptr);
+typedef void *(CURL_MEMORY_CALLCONV *curl_realloc_callback)(void *ptr, size_t size);
+typedef char *(CURL_MEMORY_CALLCONV *curl_strdup_callback)(const char *str);
+typedef void *(CURL_MEMORY_CALLCONV *curl_calloc_callback)(size_t nmemb, size_t size);
 
 #define CURL_DID_MEMORY_FUNC_TYPEDEFS
 #endif

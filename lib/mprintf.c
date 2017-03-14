@@ -563,7 +563,7 @@ static int dprintf_formatf(
   void *data, /* untouched by format(), just sent to the stream() function in
                  the second argument */
   /* function pointer called for each output character */
-  int (*stream)(int, FILE *),
+  int (CURL_MEMORY_CALLCONV *stream)(int, FILE *),
   const char *format,    /* %-formatted string */
   va_list ap_save) /* list of parameters */
 {
@@ -988,7 +988,7 @@ static int dprintf_formatf(
 }
 
 /* fputc() look-alike */
-static int addbyter(int output, FILE *data)
+static int CURL_MEMORY_CALLCONV addbyter(int output, FILE *data)
 {
   struct nsprintf *infop=(struct nsprintf *)data;
   unsigned char outc = (unsigned char)output;
@@ -1036,7 +1036,7 @@ int curl_msnprintf(char *buffer, size_t maxlength, const char *format, ...)
 }
 
 /* fputc() look-alike */
-static int alloc_addbyter(int output, FILE *data)
+static int CURL_MEMORY_CALLCONV alloc_addbyter(int output, FILE *data)
 {
   struct asprintf *infop=(struct asprintf *)data;
   unsigned char outc = (unsigned char)output;
@@ -1125,7 +1125,7 @@ char *curl_mvaprintf(const char *format, va_list ap_save)
     return strdup("");
 }
 
-static int storebuffer(int output, FILE *data)
+static int CURL_MEMORY_CALLCONV storebuffer(int output, FILE *data)
 {
   char **buffer = (char **)data;
   unsigned char outc = (unsigned char)output;
