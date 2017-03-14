@@ -222,6 +222,10 @@ struct ssl_backend_data {
 
 #define BACKEND connssl->backend
 
+#ifdef CURL_USE_PLATFORM_CERTIFICATE_STORE
+static void load_system_certs(X509_STORE *sslstore);
+#endif
+
 /*
  * Number of bytes to read from the random number seed file. This must be
  * a finite value (because some entropy "files" like /dev/urandom have
@@ -2519,7 +2523,11 @@ static CURLcode ossl_connect_step1(struct connectdata *conn, int sockindex)
           ssl_cafile ? ssl_cafile : "none",
           ssl_capath ? ssl_capath : "none");
   }
-#ifdef CURL_CA_FALLBACK
+#ifdef CURL_USE_PLATFORM_CERTIFICATE_STORE
+  else {
+    load_system_certs(BACKEND->ctx->cert_store);
+  }
+#elif defined(CURL_CA_FALLBACK)
   else if(verifypeer) {
     /* verfying the peer without any CA certificates won't
        work so use openssl's built in default as fallback */
@@ -3840,4 +3848,122 @@ const struct Curl_ssl Curl_ssl_openssl = {
 #endif
 };
 
+#ifdef CURL_USE_PLATFORM_CERTIFICATE_STORE
+
+#if defined(__APPLE__) 
+#include <Security/Security.h>
+
+static void load_system_certs(X509_STORE *sslstore) {
+  X509_STORE* pStore = sslstore;
+    
+  CFArrayRef RootCerts;
+  if (SecTrustCopyAnchorCertificates(&RootCerts) == 0) {
+    for (int i = 0; i < CFArrayGetCount(RootCerts); ++i) {
+      SecCertificateRef CertRef = (SecCertificateRef)(void*)(CFArrayGetValueAtIndex(RootCerts, i));
+        
+#ifndef AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER
+      CSSM_DATA certCSSMData;
+      if (SecCertificateGetData(CertRef, &certCSSMData) != 0 || certCSSMData.Length == 0)
+        continue;
+      unsigned const char* pDERCert = certCSSMData.Data;
+      unsigned long DataLength = certCSSMData.Length;
+      X509* pCertificate = d2i_X509(NULL, &pDERCert, DataLength);
+#else
+      CFDataRef DERCert = SecCertificateCopyData(CertRef);
+      if (!DERCert)
+        continue;
+        
+      unsigned const char* pDERCert = CFDataGetBytePtr(DERCert);
+      unsigned long DataLength = CFDataGetLength(DERCert);
+      X509* pCertificate = d2i_X509(NULL, &pDERCert, DataLength);
+      CFRelease(DERCert);
+#endif
+      if (!pCertificate)
+        continue;
+        
+      X509_STORE_add_cert(pStore, pCertificate);
+      X509_free(pCertificate);
+    }
+    
+    CFRelease(RootCerts);
+  }
+}
+
+#elif defined(WIN32)
+#include <Windows.h>
+#include <Wincrypt.h>
+
+#pragma comment(lib, "crypt32.lib")
+
+static BIO* base64encode(unsigned char const* _pToEncode, unsigned long _Len) {
+  BIO* pMemoryBio = BIO_new(BIO_s_mem());
+  BIO* pBase64Bio = BIO_new(BIO_f_base64());
+
+  pBase64Bio = BIO_push(pBase64Bio, pMemoryBio);
+
+  BIO_write(pBase64Bio, _pToEncode, _Len);
+  BIO_flush(pBase64Bio);
+  
+  return pBase64Bio;
+}
+
+static void load_from_store(LPCWSTR store, X509_STORE* sslstore)
+{
+  HCERTSTORE hStore = CertOpenSystemStore(NULL, store);
+  for (PCCERT_CONTEXT pCertContext = CertEnumCertificatesInStore(hStore, nullptr); 
+       pCertContext; 
+       pCertContext = CertEnumCertificatesInStore(hStore, pCertContext)) {
+    const char *pOutputType = pCertContext->dwCertEncodingType == PKCS_7_ASN_ENCODING ? "PKCS7" : "CERTIFICATE";
+
+    BIO *pCertData = base64encode(pCertContext->pbCertEncoded, pCertContext->cbCertEncoded);
+    BIO *pFullCertificateBio = BIO_new(BIO_s_mem());
+
+    BIO_puts(pFullCertificateBio, "-----BEGIN ");
+    BIO_puts(pFullCertificateBio, pOutputType);
+    BIO_puts(pFullCertificateBio, "-----\n");
+    {
+      BUF_MEM* pMemory = nullptr;
+      BIO_get_mem_ptr(pCertData, &pMemory);
+      
+      BIO_write(pFullCertificateBio, pMemory->data, pMemory->length - 1);
+    }
+    BIO_free_all(pCertData);
+    BIO_puts(pFullCertificateBio, "-----END ");
+    BIO_puts(pFullCertificateBio, pOutputType);
+    BIO_puts(pFullCertificateBio, "-----\n");
+    BIO_flush(pFullCertificateBio);
+
+    X509* pCertificate = nullptr;
+    {
+      BUF_MEM* pMemory = nullptr;
+      BIO_get_mem_ptr(pFullCertificateBio, &pMemory);
+      
+      BIO* pMemoryBio = BIO_new_mem_buf(pMemory->data, pMemory->length);
+      if (pMemoryBio) {
+        pCertificate = PEM_read_bio_X509(pMemoryBio, nullptr, nullptr, nullptr);
+        BIO_free(pMemoryBio);
+      }
+    }
+
+    if (!pCertificate)
+      continue;
+
+    X509_STORE_add_cert(sslstore, pCertificate);
+    X509_free(pCertificate);
+  }
+
+  CertCloseStore(hStore, 0);
+}
+
+static void load_system_certs(X509_STORE *sslstore) {
+  load_from_store(L"ROOT", sslstore);
+  load_from_store(L"CA", sslstore);
+}
+#else
+#error "Implement this"
+#endif
+#endif /* CURL_USE_PLATFORM_CERTIFICATE_STORE */
+
 #endif /* USE_OPENSSL */
+
+
