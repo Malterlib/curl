@@ -1290,7 +1290,7 @@ CURLcode curl_mime_filedata(curl_mimepart *part, const char *filename)
   if(filename) {
     struct_stat sbuf;
 
-    if(stat(filename, &sbuf) || access(filename, R_OK))
+    if(stat(filename, &sbuf) || _access(filename, R_OK))
       result = CURLE_READ_ERROR;
 
     part->data = strdup(filename);
