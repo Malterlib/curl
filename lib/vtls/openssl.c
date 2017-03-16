@@ -1374,8 +1374,8 @@ static CURLcode verifyhost(struct connectdata *conn, X509 *server_cert)
   altnames = X509_get_ext_d2i(server_cert, NID_subject_alt_name, NULL, NULL);
 
   if(altnames) {
-    int numalts;
-    int i;
+    size_t numalts;
+    size_t i;
     bool dnsmatched = FALSE;
     bool ipmatched = FALSE;
 
@@ -2768,7 +2768,7 @@ static CURLcode get_cert_chain(struct connectdata *conn,
     return CURLE_OUT_OF_MEMORY;
   }
 
-  numcerts = sk_X509_num(sk);
+  numcerts = (int)sk_X509_num(sk);
 
   result = Curl_ssl_init_certinfo(data, numcerts);
   if(result) {
@@ -3733,8 +3733,8 @@ static BIO* base64encode(unsigned char const* _pToEncode, unsigned long _Len) {
 
 static void load_from_store(LPCWSTR store, X509_STORE* sslstore)
 {
-  HCERTSTORE hStore = CertOpenSystemStore(NULL, store);
-  for (PCCERT_CONTEXT pCertContext = CertEnumCertificatesInStore(hStore, nullptr); 
+  HCERTSTORE hStore = CertOpenSystemStore((HCRYPTPROV_LEGACY)NULL, store);
+  for (PCCERT_CONTEXT pCertContext = CertEnumCertificatesInStore(hStore, NULL); 
        pCertContext; 
        pCertContext = CertEnumCertificatesInStore(hStore, pCertContext)) {
     const char *pOutputType = pCertContext->dwCertEncodingType == PKCS_7_ASN_ENCODING ? "PKCS7" : "CERTIFICATE";
@@ -3746,10 +3746,10 @@ static void load_from_store(LPCWSTR store, X509_STORE* sslstore)
     BIO_puts(pFullCertificateBio, pOutputType);
     BIO_puts(pFullCertificateBio, "-----\n");
     {
-      BUF_MEM* pMemory = nullptr;
+      BUF_MEM* pMemory = NULL;
       BIO_get_mem_ptr(pCertData, &pMemory);
       
-      BIO_write(pFullCertificateBio, pMemory->data, pMemory->length - 1);
+      BIO_write(pFullCertificateBio, pMemory->data, (int)(pMemory->length - 1));
     }
     BIO_free_all(pCertData);
     BIO_puts(pFullCertificateBio, "-----END ");
@@ -3757,14 +3757,14 @@ static void load_from_store(LPCWSTR store, X509_STORE* sslstore)
     BIO_puts(pFullCertificateBio, "-----\n");
     BIO_flush(pFullCertificateBio);
 
-    X509* pCertificate = nullptr;
+    X509* pCertificate = NULL;
     {
-      BUF_MEM* pMemory = nullptr;
+      BUF_MEM* pMemory = NULL;
       BIO_get_mem_ptr(pFullCertificateBio, &pMemory);
       
-      BIO* pMemoryBio = BIO_new_mem_buf(pMemory->data, pMemory->length);
+      BIO* pMemoryBio = BIO_new_mem_buf(pMemory->data, (int)pMemory->length);
       if (pMemoryBio) {
-        pCertificate = PEM_read_bio_X509(pMemoryBio, nullptr, nullptr, nullptr);
+        pCertificate = PEM_read_bio_X509(pMemoryBio, NULL, NULL, NULL);
         BIO_free(pMemoryBio);
       }
     }
