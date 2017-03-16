@@ -58,7 +58,7 @@ Compile
 		PreprocessorDefines "OS=\"@(PlatformFamily)\";BUILDING_LIBCURL=1;CURL_DISABLE_DICT=1;CURL_DISABLE_FTP=1;CURL_DISABLE_GOPHER=1;CURL_DISABLE_FILE=1;CURL_DISABLE_IMAP=1;"\
 							"CURL_DISABLE_LDAP=1;CURL_DISABLE_LDAPS=1;CURL_DISABLE_POP3=1;CURL_DISABLE_PROXY=1;"\
 							"CURL_DISABLE_RTSP=1;CURL_DISABLE_TELNET=1;CURL_DISABLE_TFTP=1;"\
-							"CURL_DISABLE_COOKIES=1;USE_OPENSSL=1;USE_SSLEAY=1;@(Compile.PreprocessorDefines)"
+							"CURL_DISABLE_COOKIES=1;USE_OPENSSL=1;USE_SSLEAY=1;CURL_IGNORE_WINDOWS_TARGET=1;@(Compile.PreprocessorDefines)"
 		
 		PreprocessorDefines "CURL_DISABLE_SMTP=1;@(Compile.PreprocessorDefines)"
 		{
@@ -115,7 +115,7 @@ Compile
 			}
 		}
 
-		PreprocessorDefines "CURL_PULL_WS2TCPIP_H=1;HAVE_STDBOOL_H=1;HAVE_BOOL_T=1;CURL_STATICLIB;@(Compile.PreprocessorDefines)"
+		PreprocessorDefines "HAVE_STDBOOL_H=1;HAVE_BOOL_T=1;CURL_STATICLIB;@(Compile.PreprocessorDefines)"
 		{
 			!!PlatformFamily Windows
 		}
@@ -151,7 +151,7 @@ Compile
 							""
 							
 				{
-					!!PlatforFamily "Windows"
+					!!PlatformFamily "Windows"
 				}
 
 				Contents	"@(Contents)"\
@@ -163,7 +163,7 @@ Compile
 							""
 							
 				{
-					!PlatforFamily "Windows"
+					!PlatformFamily "Windows"
 				}
 				
 				Contents	"@(Contents)\n"\
@@ -261,18 +261,6 @@ Compile
 	}
 	%Group "Lib"
 	{
-		%Group "Windows"
-		{
-			!!PlatformFamily Windows
-			%File "lib/asyn-thread.c"
-			%File "lib/asyn-ares.c"
-			%File "lib/curl_threads.c"
-			%File "lib/strtok.c"
-			%File "lib/inet_ntop.c"
-			%File "lib/inet_pton.c"
-			%File "lib/hostasyn.c"
-			%File "lib/hansoft_win_patches.cpp"
-		}
 		%File "lib/*.c"
 		%File "lib/*.h"
 		%Group "vaouth"
@@ -285,4 +273,3 @@ Compile
 		}
 	}
 }
-
