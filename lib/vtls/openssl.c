@@ -1119,7 +1119,7 @@ static CURLcode verifyhost(struct connectdata *conn, X509 *server_cert)
 
   if(altnames) {
     size_t numalts;
-    int i;
+    size_t i;
     bool dnsmatched = FALSE;
     bool ipmatched = FALSE;
 
