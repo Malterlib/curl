@@ -36,7 +36,9 @@
 
 #if !defined(HAVE_STRUCT_POLLFD) && \
     !defined(HAVE_SYS_POLL_H) && \
-    !defined(HAVE_POLL_H)
+    !defined(HAVE_POLL_H) && (!defined(_WIN32_WINNT) || defined(_WIN32_WINNT) && (_WIN32_WINNT < 0x0600))
+
+
 
 #define POLLIN      0x01
 #define POLLPRI     0x02
