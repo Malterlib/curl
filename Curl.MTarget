@@ -25,7 +25,7 @@ Compile
 		}
 	}
 	
-	SearchPath "@('include'->MakeAbsolute());@(Builtin.Function->GetProperty('Property', 'GeneratedDirectory', 'Group:External.Group:curl.Target:Lib_Curl.Target:Lib_Curl'))/curl;@(Compile.SearchPath)"
+	SearchPath "@('include'->MakeAbsolute());@(Builtin.Function->GetProperty('Property', 'GeneratedDirectory', 'Group:External.Group:curl_original.Target:Lib_Curl.Target:Lib_Curl'))/curl;@(Compile.SearchPath)"
 	PreprocessorDefines "CURL_STATICLIB;@(Compile.PreprocessorDefines)"
 }
 
@@ -35,7 +35,7 @@ Compile
 	{
 		BaseName "Curl"
 		Type "StaticLibrary"
-		Group "External/curl"
+		Group "External/curl_original"
 	}
 	Compile
 	{
