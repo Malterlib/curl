@@ -849,8 +849,13 @@ int cert_stuff(struct connectdata *conn,
       EVP_PKEY *priv_key = SSL_get_privatekey(ssl);
       if(EVP_PKEY_id(priv_key) == EVP_PKEY_RSA) {
         RSA *rsa = EVP_PKEY_get1_RSA(priv_key);
+#if defined(OPENSSL_IS_BORINGSSL)
+        if(RSA_is_opaque(rsa))
+          check_privkey = FALSE;
+#else
         if(RSA_flags(rsa) & RSA_METHOD_FLAG_NO_CHECK)
           check_privkey = FALSE;
+#endif
         RSA_free(rsa); /* Decrement reference count */
       }
     }
@@ -2366,7 +2371,7 @@ static CURLcode ossl_connect_step1(struct connectdata *conn, int sockindex)
   }
 #ifdef CURL_USE_PLATFORM_CERTIFICATE_STORE
   else {
-    load_system_certs(BACKEND->ctx->cert_store);
+    load_system_certs(SSL_CTX_get_cert_store(BACKEND->ctx));
   }
 #elif defined(CURL_CA_FALLBACK)
   else if(verifypeer) {
