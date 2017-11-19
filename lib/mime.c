@@ -652,7 +652,7 @@ static int mime_mem_seek(void *instream, curl_off_t offset, int whence)
   return CURL_SEEKFUNC_OK;
 }
 
-static void mime_mem_free(void *ptr)
+static void CURL_MEMORY_CALLCONV mime_mem_free(void *ptr)
 {
   Curl_safefree(((curl_mimepart *) ptr)->data);
 }
@@ -695,7 +695,7 @@ static int mime_file_seek(void *instream, curl_off_t offset, int whence)
                CURL_SEEKFUNC_CANTSEEK: CURL_SEEKFUNC_OK;
 }
 
-static void mime_file_free(void *ptr)
+static void CURL_MEMORY_CALLCONV mime_file_free(void *ptr)
 {
   curl_mimepart *part = (curl_mimepart *) ptr;
 
@@ -1087,7 +1087,7 @@ static void cleanup_part_content(curl_mimepart *part)
   part->kind = MIMEKIND_NONE;
 }
 
-static void mime_subparts_free(void *ptr)
+static void CURL_MEMORY_CALLCONV mime_subparts_free(void *ptr)
 {
   curl_mime *mime = (curl_mime *) ptr;
 
@@ -1099,7 +1099,7 @@ static void mime_subparts_free(void *ptr)
 }
 
 /* Do not free subparts: unbind them. This is used for the top level only. */
-static void mime_subparts_unbind(void *ptr)
+static void CURL_MEMORY_CALLCONV mime_subparts_unbind(void *ptr)
 {
   curl_mime *mime = (curl_mime *) ptr;
 
