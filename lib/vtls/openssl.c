@@ -3750,7 +3750,7 @@ static void load_from_store(LPCWSTR store, X509_STORE* sslstore)
       BIO_write(pFullCertificateBio, pMemory->data, (int)(pMemory->length - 1));
     }
     BIO_free_all(pCertData);
-    BIO_puts(pFullCertificateBio, "-----END ");
+    BIO_puts(pFullCertificateBio, "\n-----END ");
     BIO_puts(pFullCertificateBio, pOutputType);
     BIO_puts(pFullCertificateBio, "-----\n");
     BIO_flush(pFullCertificateBio);
