@@ -37,6 +37,10 @@ Compile
 		Type "StaticLibrary"
 		Group "External/curl_original"
 	}
+	Property
+	{
+		MalterlibMSVCEnableUTF8 false
+	}
 	Compile
 	{
 		!!MalterlibCompileSupportTabSetings true
