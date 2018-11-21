@@ -172,6 +172,10 @@ typedef unsigned long sslerr_t;
 #endif
 #define ossl_valsize_t numcert_t
 
+#ifdef CURL_CA_EXTERNAL_FALLBACK
+void curl_ca_external_fallback(X509_STORE *sslstore);
+#endif
+
 static CURLcode push_certinfo(struct Curl_easy *data,
                               BIO *mem, const char *label, int num)
   WARN_UNUSED_RESULT;
@@ -3078,11 +3082,15 @@ static CURLcode ossl_load_trust_anchors(struct Curl_cfilter *cf,
 #endif
   }
 
-#ifdef CURL_CA_FALLBACK
+#if defined(CURL_CA_FALLBACK) || defined(CURL_CA_EXTERNAL_FALLBACK)
   if(octx->store_is_empty) {
     /* verifying the peer without any CA certificates does not
        work so use OpenSSL's built-in default as fallback */
+#ifdef CURL_CA_EXTERNAL_FALLBACK
+      curl_ca_external_fallback(store);
+#elif defined(CURL_CA_FALLBACK)
     X509_STORE_set_default_paths(store);
+#endif
     infof(data, "  OpenSSL default paths (fallback)");
     octx->store_is_empty = FALSE;
   }
