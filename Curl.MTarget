@@ -18,10 +18,12 @@ Compile
 	&
 	{
 		CompileDialect "C"
+		!DocumentationEnabled true
 		|
 		{
-			CurlTargetInDependencies true			
+			CurlTargetInDependencies true
 			MalterlibUseCurl true
+
 		}
 	}
 	
