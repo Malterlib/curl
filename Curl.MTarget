@@ -135,15 +135,6 @@ Compile
 			!!PlatformFamily Windows
 		}
 
-		PreprocessorDefines "HAVE_OPENSSL_ENGINE_H=1;@(Compile.PreprocessorDefines)"
-		{
-			&
-			{
-				!PlatformFamily Windows
-				!DefaultMalterlibSSLLibrary BoringSSL
-			}
-		}
-
 		PreprocessorDefines "HAVE_STDBOOL_H=1;HAVE_BOOL_T=1;CURL_STATICLIB;_CRT_NONSTDC_NO_DEPRECATE;@(Compile.PreprocessorDefines)"
 		{
 			!!PlatformFamily Windows
