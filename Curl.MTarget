@@ -31,7 +31,7 @@ Compile
 	PreprocessorDefines "CURL_STATICLIB;@(Compile.PreprocessorDefines)"
 }
 
-%Target Lib_Curl
+%Target "Lib_Curl"
 {
 	Target
 	{
@@ -58,7 +58,7 @@ Compile
 		
 		Warnings_UnusedVariable false
 		{
-			!!GeneratorFamily Xcode
+			!!GeneratorFamily "Xcode"
 		}
 
 		PreprocessorDefines "OS=\"@(PlatformFamily)\";BUILDING_LIBCURL=1;CURL_DISABLE_DICT=1;CURL_DISABLE_FTP=1;CURL_DISABLE_GOPHER=1;CURL_DISABLE_FILE=1;CURL_DISABLE_IMAP=1;"\
@@ -99,60 +99,60 @@ Compile
 							"@(Compile.PreprocessorDefines)"
 
 		{
-			!PlatformFamily Windows
+			!PlatformFamily "Windows"
 		}
 
 		PreprocessorDefines "SIZEOF_SHORT=2;SIZEOF_INT=4;SIZEOF_CURL_OFF_T=8;@(Compile.PreprocessorDefines)"
 
 		PreprocessorDefines "SIZEOF_SIZE_T=8;@(Compile.PreprocessorDefines)"
 		{
-			!!Architecture x64
+			!!Architecture "x64"
 		}
 		PreprocessorDefines "SIZEOF_SIZE_T=4;@(Compile.PreprocessorDefines)"
 		{
-			!!Architecture x86
+			!!Architecture "x86"
 		}
 
 		PreprocessorDefines "SIZEOF_LONG=8;@(Compile.PreprocessorDefines)"
 		{
 			&
 			{
-				!PlatformFamily Windows
-				Architecture x64
+				!PlatformFamily "Windows"
+				Architecture "x64"
 			}
 		}
 		PreprocessorDefines "SIZEOF_LONG=4;@(Compile.PreprocessorDefines)"
 		{
 			&
 			{
-				!PlatformFamily Windows
-				Architecture x86
+				!PlatformFamily "Windows"
+				Architecture "x86"
 			}
 
 		}
 		PreprocessorDefines "SIZEOF_LONG=4;@(Compile.PreprocessorDefines)"
 		{
-			!!PlatformFamily Windows
+			!!PlatformFamily "Windows"
 		}
 
 		PreprocessorDefines "HAVE_STDBOOL_H=1;HAVE_BOOL_T=1;CURL_STATICLIB;_CRT_NONSTDC_NO_DEPRECATE;@(Compile.PreprocessorDefines)"
 		{
-			!!PlatformFamily Windows
+			!!PlatformFamily "Windows"
 		}
 
 		PreprocessorDefines "HAVE_SYS_SOCKIO_H=1;_DARWIN_USE_64_BIT_INODE=1;@(Compile.PreprocessorDefines)"
 		{
-			!!PlatformFamily OSX
+			!!PlatformFamily "OSX"
 		}
 							
 		PreprocessorDefines "CURL_CA_BUNDLE=\"/etc/ssl/certs/ca-certificates.crt\";@(Compile.PreprocessorDefines)"
 		{
-			!!PlatformFamily Linux
+			!!PlatformFamily "Linux"
 		}
 		
 		PreprocessorDefines "CURL_CA_EXTERNAL_FALLBACK=1;@(Compile.PreprocessorDefines)"
 		{
-			!PlatformFamily Linux
+			!PlatformFamily "Linux"
 		}
 	}
 	%Group "Lib"
