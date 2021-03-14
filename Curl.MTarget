@@ -1,7 +1,7 @@
 
 Property
 {
-	CurlTargetInDependencies define bool = fg_IsLibraryInDependencies("Lib_Curl")
+	CurlTargetInDependencies define bool = fg_IsTargetInDependencies("Lib_Curl")
 }
 
 Compile
