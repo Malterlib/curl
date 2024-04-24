@@ -71,6 +71,10 @@
 #include <openssl/tls1.h>
 #include <openssl/evp.h>
 
+#ifndef OPENSSL_IS_BORINGSSL
+#error "Make sure BoringSSL is first in include path"
+#endif
+
 #if defined(HAVE_SSL_SET1_ECH_CONFIG_LIST) && !defined(HAVE_BORINGSSL_LIKE)
 #include <openssl/ech.h>
 #endif
