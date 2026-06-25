@@ -988,6 +988,7 @@ if(ZLIB_FOUND)
   # Depend on ZLIB via imported targets. This allows our dependents to
   # get our dependencies transitively.
   list(APPEND CURL_LIBS ZLIB::ZLIB)
+  set(CURL_ZLIB_REQUIRED_LIBRARY ZLIB::ZLIB CACHE STRING "Library to use for zlib configure checks")
   list(APPEND LIBCURL_PC_REQUIRES_PRIVATE "zlib")
 endif()
 
@@ -1030,7 +1031,7 @@ macro(curl_openssl_check_exists)
     list(APPEND CMAKE_REQUIRED_LIBRARIES OpenSSL::SSL OpenSSL::Crypto)
     list(APPEND CMAKE_REQUIRED_DEFINITIONS "-DOPENSSL_SUPPRESS_DEPRECATED")  # for SSL_CTX_set_srp_username deprecated since 3.0.0
     if(HAVE_LIBZ)
-      list(APPEND CMAKE_REQUIRED_LIBRARIES ZLIB::ZLIB)
+      list(APPEND CMAKE_REQUIRED_LIBRARIES ${CURL_ZLIB_REQUIRED_LIBRARY})
     endif()
     if(WIN32 AND NOT WINCE)
       list(APPEND CMAKE_REQUIRED_LIBRARIES "bcrypt")  # for OpenSSL/LibreSSL
@@ -1041,7 +1042,7 @@ macro(curl_openssl_check_exists)
     list(APPEND CMAKE_REQUIRED_LIBRARIES "${WOLFSSL_LIBRARIES}")
     curl_required_libpaths("${WOLFSSL_LIBRARY_DIRS}")
     if(HAVE_LIBZ)
-      list(APPEND CMAKE_REQUIRED_LIBRARIES ZLIB::ZLIB)  # Public wolfSSL headers also require zlib headers
+      list(APPEND CMAKE_REQUIRED_LIBRARIES ${CURL_ZLIB_REQUIRED_LIBRARY})  # Public wolfSSL headers also require zlib headers
     endif()
     list(APPEND CMAKE_REQUIRED_DEFINITIONS "-DHAVE_UINTPTR_T")  # to pull in stdint.h (as of wolfSSL v5.5.4)
   endif()
