@@ -989,6 +989,7 @@ if(ZLIB_FOUND)
   # Depend on ZLIB via imported targets. This allows our dependents to
   # get our dependencies transitively.
   list(APPEND CURL_LIBS ZLIB::ZLIB)
+  set(CURL_ZLIB_REQUIRED_LIBRARY ZLIB::ZLIB CACHE STRING "Library to use for zlib configure checks")
 endif()
 
 set(HAVE_BROTLI OFF)
@@ -1015,7 +1016,7 @@ macro(curl_openssl_check_exists)
   if(USE_OPENSSL)
     list(APPEND CMAKE_REQUIRED_LIBRARIES OpenSSL::SSL OpenSSL::Crypto)
     if(HAVE_LIBZ)
-      list(APPEND CMAKE_REQUIRED_LIBRARIES ZLIB::ZLIB)
+      list(APPEND CMAKE_REQUIRED_LIBRARIES ${CURL_ZLIB_REQUIRED_LIBRARY})
     endif()
     if(WIN32)
       list(APPEND CMAKE_REQUIRED_LIBRARIES "bcrypt")  # for OpenSSL/LibreSSL BCryptGenRandom()
@@ -1025,7 +1026,7 @@ macro(curl_openssl_check_exists)
     list(APPEND CMAKE_REQUIRED_LIBRARIES CURL::wolfssl)
     list(APPEND CMAKE_REQUIRED_DEFINITIONS "-DWOLFSSL_OPTIONS_IGNORE_SYS")
     if(HAVE_LIBZ)
-      list(APPEND CMAKE_REQUIRED_LIBRARIES ZLIB::ZLIB)  # Public wolfSSL headers also require zlib headers
+      list(APPEND CMAKE_REQUIRED_LIBRARIES ${CURL_ZLIB_REQUIRED_LIBRARY})  # Public wolfSSL headers also require zlib headers
     endif()
     list(APPEND CMAKE_REQUIRED_DEFINITIONS "-DHAVE_UINTPTR_T")  # to pull in stdint.h (as of wolfSSL 5.5.4)
   endif()
