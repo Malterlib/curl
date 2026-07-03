@@ -85,6 +85,15 @@
 #include "../curl_memory.h"
 #include "../memdebug.h"
 
+#ifdef CURL_CA_EXTERNAL_FALLBACK
+/* The external CA fallback supplies system trust anchors at handshake time.
+   Build-time CA bundle/path defaults would shadow it and hard-fail on
+   distributions where the configured paths do not exist, so do not apply
+   them. */
+#undef CURL_CA_BUNDLE
+#undef CURL_CA_PATH
+#endif
+
 
 #define CLONE_STRING(var)                    \
   do {                                       \
