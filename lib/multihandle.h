@@ -24,6 +24,9 @@
  *
  ***************************************************************************/
 #include "api.h"
+#ifdef CURLRES_EXTERNAL
+#include <curl/external_resolver.h>
+#endif
 #include "llist.h"
 #include "hash.h"
 #include "conncache.h"
@@ -95,6 +98,9 @@ struct Curl_multi {
                                   passed INIT state but are not COMPLETE yet */
   uint32_t max_concurrent_streams;
   curl_off_t xfers_total_ever; /* total of added transfers, ever. */
+#ifdef CURLRES_EXTERNAL
+  struct curl_external_resolver external_resolver;
+#endif
 
   struct uint32_tbl xfers; /* transfers added to this multi */
   /* A transfer's mid may be present in at most one of
