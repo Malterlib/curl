@@ -46,6 +46,7 @@ man_MANS = \
   curl_easy_unescape.3 \
   curl_easy_upkeep.3 \
   curl_escape.3 \
+  curl_external_resolver_ready.3 \
   curl_formadd.3 \
   curl_formfree.3 \
   curl_formget.3 \
@@ -83,6 +84,7 @@ man_MANS = \
   curl_multi_perform.3 \
   curl_multi_poll.3 \
   curl_multi_remove_handle.3 \
+  curl_multi_set_external_resolver.3 \
   curl_multi_setopt.3 \
   curl_multi_socket.3 \
   curl_multi_socket_action.3 \

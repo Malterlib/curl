@@ -791,3 +791,6 @@ ${SIZEOF_TIME_T_CODE}
 
 /* Define to 1 if OpenSSL has the DES_ecb_encrypt function. */
 #cmakedefine HAVE_DES_ECB_ENCRYPT 1
+
+/* Host-provided asynchronous resolver */
+#cmakedefine USE_EXTERNAL_RESOLVER 1

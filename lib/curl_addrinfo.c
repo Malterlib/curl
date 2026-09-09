@@ -347,15 +347,15 @@ struct Curl_addrinfo *Curl_he2ai(const struct hostent *he, int port)
 #endif
 
 /*
- * ip2addr()
+ * Curl_ip2addr()
  *
  * This function takes an Internet address, in binary form, as input parameter
  * along with its address family and the string version of the address, and it
  * returns a Curl_addrinfo chain filled in correctly with information for the
  * given address/host
  */
-static CURLcode ip2addr(struct Curl_addrinfo **addrp, int af,
-                        const void *inaddr, const char *hostname, int port)
+CURLcode Curl_ip2addr(struct Curl_addrinfo **addrp, int af,
+                     const void *inaddr, const char *hostname, int port)
 {
   struct Curl_addrinfo *ai;
   size_t addrsize;
@@ -426,13 +426,13 @@ CURLcode Curl_str2addr(const char *dotted, uint16_t port,
   struct in_addr in;
   if(curlx_inet_pton(AF_INET, dotted, &in) > 0)
     /* This is a dotted IP address 123.123.123.123-style */
-    return ip2addr(addrp, AF_INET, &in, dotted, port);
+    return Curl_ip2addr(addrp, AF_INET, &in, dotted, port);
 #ifdef USE_IPV6
   {
     struct in6_addr in6;
     if(curlx_inet_pton(AF_INET6, dotted, &in6) > 0)
       /* This is a dotted IPv6 address ::1-style */
-      return ip2addr(addrp, AF_INET6, &in6, dotted, port);
+      return Curl_ip2addr(addrp, AF_INET6, &in6, dotted, port);
   }
 #endif
   return CURLE_BAD_FUNCTION_ARGUMENT; /* bad input format */
