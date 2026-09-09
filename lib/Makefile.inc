@@ -87,6 +87,7 @@ LIB_VAUTH_HFILES =      \
 LIB_VDNS_CFILES =           \
   vdns/asyn-ares.c          \
   vdns/asyn-base.c          \
+  vdns/asyn-external.c\
   vdns/asyn-thrdd.c         \
   vdns/cf-dns.c             \
   vdns/dnscache.c           \

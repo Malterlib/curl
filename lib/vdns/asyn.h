@@ -24,6 +24,9 @@
  *
  ***************************************************************************/
 #include "curl_setup.h"
+#ifdef CURLRES_EXTERNAL
+#include <curl/external_resolver.h>
+#endif
 
 #if defined(USE_HTTPSRR) && defined(USE_ARES)
 #include "vdns/httpsrr.h"
@@ -34,6 +37,15 @@ struct Curl_dns_entry;
 struct Curl_resolv_async;
 struct Curl_multi;
 struct easy_pollset;
+
+#ifdef CURLRES_EXTERNAL
+void Curl_async_external_destroy(struct Curl_resolv_async *async);
+CURLcode Curl_async_external_getaddrinfo(struct Curl_easy *data,
+                                       struct Curl_resolv_async *async);
+CURLcode Curl_async_external_take_result(struct Curl_easy *data,
+                                       struct Curl_resolv_async *async,
+                                       struct Curl_dns_entry **pdns);
+#endif
 
 #ifdef CURLRES_ASYNCH
 
@@ -216,6 +228,11 @@ struct Curl_resolv_async {
   struct Curl_peer *peer;
   struct Curl_addrinfo *ai_A;
   struct Curl_addrinfo *ai_AAAA;
+#ifdef CURLRES_EXTERNAL
+  void *external;
+  int (*external_poll)(void *, const struct curl_external_address **, size_t *);
+  void (*external_cancel)(void *);
+#endif
 #ifdef USE_HTTPSRR
   struct Curl_https_rrinfo *httpsrr;
 #endif

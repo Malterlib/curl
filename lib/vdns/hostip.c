@@ -438,6 +438,11 @@ static CURLcode hostip_resolv_take_result(struct Curl_easy *data,
     result = Curl_doh_take_result(data, async, pdns);
   else
 #endif
+#ifdef CURLRES_EXTERNAL
+  if(async->external)
+    result = Curl_async_external_take_result(data, async, pdns);
+  else
+#endif
   result = Curl_async_take_result(data, async, pdns);
 
   if(result == CURLE_AGAIN) {
@@ -645,6 +650,11 @@ static CURLcode hostip_resolv_start(struct Curl_easy *data,
       goto out;
     }
   }
+#ifdef CURLRES_EXTERNAL
+  if(data->multi->external_resolver.start)
+    result = Curl_async_external_getaddrinfo(data, async);
+  else
+#endif
   result = Curl_async_getaddrinfo(data, async);
   if(result == CURLE_AGAIN) {
     /* the answer might be there already. Check. */
@@ -815,6 +825,13 @@ CURLcode Curl_resolv_blocking(struct Curl_easy *data,
 #ifdef USE_CURL_ASYNC
   case CURLE_AGAIN:
     DEBUGASSERT(!*pdns);
+#ifdef CURLRES_EXTERNAL
+    if(Curl_async_get(data, resolv_id)->external)
+      result = Curl_async_external_take_result(data,
+                                               Curl_async_get(data, resolv_id),
+                                               pdns);
+    else
+#endif
     result = Curl_async_await(data, resolv_id, pdns);
     Curl_resolv_destroy(data, resolv_id);
     break;
@@ -1143,6 +1160,10 @@ CURLcode Curl_resolv_pollset(struct Curl_easy *data,
 #ifndef CURL_DISABLE_DOH
     if(async->doh) /* DoH has nothing for the pollset */
       continue;
+#endif
+#ifdef CURLRES_EXTERNAL
+    if(async->external)
+      continue; /* The host schedules completion on this multi's owner. */
 #endif
     result = Curl_async_pollset(data, async, ps);
   }

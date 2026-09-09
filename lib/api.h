@@ -72,6 +72,9 @@ typedef enum {
   CURL_EAPI_FN_ws_recv,
   CURL_EAPI_FN_ws_send,
   CURL_EAPI_FN_ws_start_frame,
+#ifdef CURLRES_EXTERNAL
+  CURL_EAPI_FN_external_resolver_ready,
+#endif
   CURL_EAPI_FN_LAST
 } Curl_eapi_fn;
 
@@ -96,6 +99,9 @@ typedef enum {
   CURL_MAPI_FN_multi_timeout,
   CURL_MAPI_FN_multi_wait,
   CURL_MAPI_FN_multi_waitfds,
+#ifdef CURLRES_EXTERNAL
+  CURL_MAPI_FN_multi_set_external_resolver,
+#endif
   CURL_MAPI_FN_LAST
 } Curl_mapi_fn;
 

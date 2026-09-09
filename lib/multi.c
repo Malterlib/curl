@@ -1146,10 +1146,15 @@ CURLMcode Curl_multi_pollset(struct Curl_easy *data,
 
   Curl_pollset_reset(ps);
 #ifdef ENABLE_INTERNAL_WAKEUP
-  /* The admin handle always listens on the wakeup socket when there
-   * are transfers alive. */
+  /* The admin handle listens for threaded resolver completions while transfers
+   * are alive. A host resolver override schedules its own completion and does
+   * not need this internally owned descriptor in the application's pollset. */
   if(data->multi && (data == data->multi->admin) &&
-     data->multi->xfers_really_alive) {
+     data->multi->xfers_really_alive
+#ifdef CURLRES_EXTERNAL
+     && !data->multi->external_resolver.start
+#endif
+    ) {
     CURL_TRC_M(data, "adding wakeup, %u xfers really alive",
                data->multi->xfers_really_alive);
     result = Curl_pollset_add_in(data, ps, data->multi->wakeup_internal[0]);
@@ -2992,6 +2997,27 @@ CURLMcode curl_multi_perform(CURLM *m, int *running_handles)
   CURL_MAPI_LEAVE(&guard);
   return mresult;
 }
+
+#ifdef CURLRES_EXTERNAL
+CURLMcode curl_multi_set_external_resolver(
+  CURLM *m, const struct curl_external_resolver *resolver)
+{
+  struct Curl_mapi_guard guard;
+  CURLMcode result;
+
+  if(CURL_MAPI_ENTER(&guard, m, multi_set_external_resolver, &result)) {
+    struct Curl_multi *multi = m;
+    /* Only the internal admin handle may be present when selecting a backend. */
+    if(!resolver || !resolver->start || !resolver->poll || !resolver->cancel ||
+       Curl_uint32_tbl_count(&multi->xfers) != 1)
+      result = CURLM_BAD_FUNCTION_ARGUMENT;
+    else
+      multi->external_resolver = *resolver;
+  }
+  CURL_MAPI_LEAVE(&guard);
+  return result;
+}
+#endif
 
 CURLMcode curl_multi_cleanup(CURLM *m)
 {
