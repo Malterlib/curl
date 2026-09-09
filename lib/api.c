@@ -65,6 +65,9 @@ static const struct Curl_eapi_fn_props eapi_fn_props[CURL_EAPI_FN_LAST] = {
   { CURL_EAPI_FN_ws_recv,          0,  1,  0,  1 },
   { CURL_EAPI_FN_ws_send,          0,  1,  0,  1 },
   { CURL_EAPI_FN_ws_start_frame,   0,  1,  0,  0 },
+#ifdef CURLRES_EXTERNAL
+  { CURL_EAPI_FN_external_resolver_ready, 0, 0, 1, 0 },
+#endif
 };
 
 struct Curl_mapi_fn_props {
@@ -97,6 +100,9 @@ static const struct Curl_mapi_fn_props mapi_fn_props[CURL_MAPI_FN_LAST] = {
   { CURL_MAPI_FN_multi_timeout,        0,  0,   1,  1 },
   { CURL_MAPI_FN_multi_wait,           0,  0,   1,  0 },
   { CURL_MAPI_FN_multi_waitfds,        0,  0,   1,  0 },
+#ifdef CURLRES_EXTERNAL
+  { CURL_MAPI_FN_multi_set_external_resolver, 0, 0, 0, 0 },
+#endif
 };
 
 struct Curl_cbapi_fn_props {
@@ -184,6 +190,18 @@ bool Curl_api_is_in_callback(struct Curl_easy *data)
   return FALSE;
 }
 
+/* The external resolver also gets internal handles, such as the DoH
+ * transfers, and reports them ready through curl_external_resolver_ready. */
+static bool eapi_allows_internal(Curl_eapi_fn fn)
+{
+#ifdef CURLRES_EXTERNAL
+  return fn == CURL_EAPI_FN_external_resolver_ready;
+#else
+  (void)fn;
+  return FALSE;
+#endif
+}
+
 bool Curl_eapi_enter(struct Curl_eapi_guard *guard,
                      CURL *curl,
                      Curl_eapi_fn fn,
@@ -196,7 +214,8 @@ bool Curl_eapi_enter(struct Curl_eapi_guard *guard,
   guard->depth = 0;
 
   /* Verify that we got an easy handle we can work with. */
-  if(!GOOD_EASY_HANDLE(data) || data->state.internal) {
+  if(!GOOD_EASY_HANDLE(data) ||
+     (data->state.internal && !eapi_allows_internal(fn))) {
     result = CURLE_BAD_FUNCTION_ARGUMENT;
     goto out;
   }
