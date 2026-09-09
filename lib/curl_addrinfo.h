@@ -83,6 +83,9 @@ bool Curl_is_ipaddr(const char *address);
 bool Curl_looks_like_ipv6(const char *s, size_t len, bool maybe_url_encoded,
                           struct Curl_str *host, struct Curl_str *zone);
 
+CURLcode Curl_ip2addr(struct Curl_addrinfo **addrp, int af,
+                     const void *inaddr, const char *hostname, int port);
+
 CURLcode Curl_str2addr(const char *dotted, uint16_t port,
                        struct Curl_addrinfo **addrp);
 

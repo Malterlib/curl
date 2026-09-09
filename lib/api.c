@@ -58,6 +58,9 @@ static const struct Curl_eapi_fn_props eapi_fn_props[CURL_EAPI_FN_LAST] = {
   { CURL_EAPI_FN_ws_recv,          0,  1,  0,  1 },
   { CURL_EAPI_FN_ws_send,          0,  1,  0,  1 },
   { CURL_EAPI_FN_ws_start_frame,   0,  1,  0,  0 },
+#ifdef CURLRES_EXTERNAL
+  { CURL_EAPI_FN_external_resolver_ready, 0, 0, 1, 0 },
+#endif
 };
 
 struct Curl_mapi_fn_props {
@@ -90,6 +93,9 @@ static const struct Curl_mapi_fn_props mapi_fn_props[CURL_MAPI_FN_LAST] = {
   { CURL_MAPI_FN_multi_timeout,        0,  0,   1,  1 },
   { CURL_MAPI_FN_multi_wait,           0,  0,   1,  0 },
   { CURL_MAPI_FN_multi_waitfds,        0,  0,   1,  0 },
+#ifdef CURLRES_EXTERNAL
+  { CURL_MAPI_FN_multi_set_external_resolver, 0, 0, 0, 0 },
+#endif
 };
 
 struct Curl_cbapi_fn_props {

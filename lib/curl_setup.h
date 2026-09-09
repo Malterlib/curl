@@ -712,6 +712,13 @@
 #  define CURLRES_SYNCH
 #endif
 
+#ifdef USE_EXTERNAL_RESOLVER
+#  ifndef CURLRES_ASYNCH
+#    error "External resolver overrides require a native async resolver"
+#  endif
+#  define CURLRES_EXTERNAL
+#endif
+
 /* ---------------------------------------------------------------- */
 
 #if defined(HAVE_LIBIDN2) && defined(HAVE_IDN2_H) && \

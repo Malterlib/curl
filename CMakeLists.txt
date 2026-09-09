@@ -664,6 +664,14 @@ elseif(USE_ARES)
   set(USE_RESOLV_ARES ON)
 endif()
 
+option(ENABLE_EXTERNAL_RESOLVER "Allow a per-multi asynchronous resolver override" OFF)
+if(ENABLE_EXTERNAL_RESOLVER)
+  if(NOT USE_RESOLV_THREADED AND NOT USE_RESOLV_ARES)
+    message(FATAL_ERROR "External resolver overrides require a native async resolver")
+  endif()
+  set(USE_EXTERNAL_RESOLVER ON)
+endif()
+
 # Check for all needed libraries
 if(DOS)
   if(WATT_ROOT)
