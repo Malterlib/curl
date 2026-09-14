@@ -95,6 +95,8 @@
 #endif /* _MSC_VER */
 
 #ifdef _WIN32
+#  include <sdkddkver.h>
+
 /*
  * Do not include unneeded stuff in Windows headers to avoid compiler
  * warnings and macro clashes.
